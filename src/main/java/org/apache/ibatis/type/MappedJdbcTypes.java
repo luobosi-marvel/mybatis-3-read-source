@@ -22,6 +22,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 用法 ：@MappedJdbcTypes({JdbcType.VARCHAR})
+ * 下面的类就是 jdbcType 对应的 java 类型了
+ *
  * @author Eduardo Macarron
  */
 @Documented
