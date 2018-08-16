@@ -16,14 +16,27 @@
 package org.apache.ibatis.logging;
 
 /**
+ * 这里表示日志级别
+ *
  * @author Clinton Begin
  */
 public interface Log {
 
+  /**
+   * 是否是 debug 模式
+   *
+   * @return true/false
+   */
   boolean isDebugEnabled();
 
   boolean isTraceEnabled();
 
+  /**
+   * error 日志级别
+   *
+   * @param s
+   * @param e
+   */
   void error(String s, Throwable e);
 
   void error(String s);

@@ -82,7 +82,7 @@ public final class PreparedStatementLogger extends BaseJdbcLogger implements Inv
     }
   }
 
-  /*
+  /**
    * Creates a logging version of a PreparedStatement
    *
    * @param stmt - the statement
@@ -95,7 +95,7 @@ public final class PreparedStatementLogger extends BaseJdbcLogger implements Inv
     return (PreparedStatement) Proxy.newProxyInstance(cl, new Class[]{PreparedStatement.class, CallableStatement.class}, handler);
   }
 
-  /*
+  /**
    * Return the wrapped prepared statement
    *
    * @return the PreparedStatement

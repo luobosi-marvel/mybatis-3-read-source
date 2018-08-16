@@ -43,6 +43,12 @@ public final class LogFactory {
     // disable construction
   }
 
+  /**
+   * 根据传入的 log 名称来获取 Log 具体实现的 日志类型
+   *
+   * @param aClass
+   * @return
+   */
   public static Log getLog(Class<?> aClass) {
     return getLog(aClass.getName());
   }
