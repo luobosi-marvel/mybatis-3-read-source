@@ -22,6 +22,8 @@ import java.util.List;
 import org.apache.ibatis.reflection.ArrayUtil;
 
 /**
+ * 缓存 key
+ *
  * @author Clinton Begin
  */
 public class CacheKey implements Cloneable, Serializable {
@@ -31,11 +33,23 @@ public class CacheKey implements Cloneable, Serializable {
   public static final CacheKey NULL_CACHE_KEY = new NullCacheKey();
 
   private static final int DEFAULT_MULTIPLYER = 37;
+  /**
+   * 默认的 hashcode
+   */
   private static final int DEFAULT_HASHCODE = 17;
 
   private final int multiplier;
+  /**
+   * 哈希值
+   */
   private int hashcode;
+  /**
+   * 冗余校验
+   */
   private long checksum;
+  /**
+   * 数量
+   */
   private int count;
   // 8/21/2017 - Sonarlint flags this as needing to be marked transient.  While true if content is not serializable, this is not always true and thus should not be marked transient.
   private List<Object> updateList;

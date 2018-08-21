@@ -34,6 +34,7 @@ public class LruCache implements Cache {
 
   public LruCache(Cache delegate) {
     this.delegate = delegate;
+    // 大小设置为 1024 个元素
     setSize(1024);
   }
 
@@ -48,6 +49,7 @@ public class LruCache implements Cache {
   }
 
   public void setSize(final int size) {
+    // 使用 LinkedHashMap 来做一个最近最少使用算法
     keyMap = new LinkedHashMap<Object, Object>(size, .75F, true) {
       private static final long serialVersionUID = 4267176411845948333L;
 
