@@ -38,12 +38,10 @@ public class LruCache implements Cache {
     setSize(1024);
   }
 
-  @Override
   public String getId() {
     return delegate.getId();
   }
 
-  @Override
   public int getSize() {
     return delegate.getSize();
   }
@@ -64,30 +62,25 @@ public class LruCache implements Cache {
     };
   }
 
-  @Override
   public void putObject(Object key, Object value) {
     delegate.putObject(key, value);
     cycleKeyList(key);
   }
 
-  @Override
   public Object getObject(Object key) {
     keyMap.get(key); //touch
     return delegate.getObject(key);
   }
 
-  @Override
   public Object removeObject(Object key) {
     return delegate.removeObject(key);
   }
 
-  @Override
   public void clear() {
     delegate.clear();
     keyMap.clear();
   }
 
-  @Override
   public ReadWriteLock getReadWriteLock() {
     return null;
   }
