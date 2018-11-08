@@ -17,6 +17,7 @@ package org.apache.ibatis.logging;
 
 /**
  * 这里表示日志级别
+ * 这个就是日志模块的抽象接口类
  *
  * @author Clinton Begin
  */

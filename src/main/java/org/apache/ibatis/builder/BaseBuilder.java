@@ -33,6 +33,9 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
  */
 public abstract class BaseBuilder {
   protected final Configuration configuration;
+  /**
+   * 别名注册器，可以拿到所有别名
+   */
   protected final TypeAliasRegistry typeAliasRegistry;
   protected final TypeHandlerRegistry typeHandlerRegistry;
 
@@ -60,7 +63,7 @@ public abstract class BaseBuilder {
 
   protected Set<String> stringSetValueOf(String value, String defaultValue) {
     value = (value == null ? defaultValue : value);
-    return new HashSet<>(Arrays.asList(value.split(",")));
+    return new HashSet<String>(Arrays.asList(value.split(",")));
   }
 
   protected JdbcType resolveJdbcType(String alias) {

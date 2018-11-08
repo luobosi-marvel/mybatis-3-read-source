@@ -34,6 +34,8 @@ import org.apache.ibatis.io.Resources;
 
 /**
  * @author Clinton Begin
+ * 别名注册器，我们在配置文件里面也可以为我们的 类 设置一个 别名
+ * 所有别名都会存储在 TYPE_ALIASES 这个 map 里面，value 是 类类型
  */
 public class TypeAliasRegistry {
 
