@@ -217,6 +217,11 @@ public class ResolverUtil<T> {
     String path = getPackagePath(packageName);
 
     try {
+      /*
+        VFS 文件操作
+        通过VFS对文件进行一些操作，包括写入、读取文件，判断文件是否可读可写等示例。
+        Apache commons VFS包和apache commons的其他基础性类有非常密切的关系。
+       */
       List<String> children = VFS.getInstance().list(path);
       for (String child : children) {
         if (child.endsWith(".class")) {
@@ -250,12 +255,14 @@ public class ResolverUtil<T> {
   @SuppressWarnings("unchecked")
   protected void addIfMatching(Test test, String fqn) {
     try {
+      // 获取扩展名称
       String externalName = fqn.substring(0, fqn.indexOf('.')).replace('/', '.');
+      // 获取类加载器
       ClassLoader loader = getClassLoader();
       if (log.isDebugEnabled()) {
         log.debug("Checking to see if class " + externalName + " matches criteria [" + test + "]");
       }
-
+      // 根据扩展名称加载指定类
       Class<?> type = loader.loadClass(externalName);
       if (test.matches(type)) {
         matches.add((Class<T>) type);

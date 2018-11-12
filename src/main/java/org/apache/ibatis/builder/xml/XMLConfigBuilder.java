@@ -264,6 +264,7 @@ public class XMLConfigBuilder extends BaseBuilder {
     configuration.setLogPrefix(props.getProperty("logPrefix"));
     @SuppressWarnings("unchecked")
     Class<? extends Log> logImpl = (Class<? extends Log>)resolveClass(props.getProperty("logImpl"));
+    // todo：设置具体的 log 实现类
     configuration.setLogImpl(logImpl);
     configuration.setConfigurationFactory(resolveClass(props.getProperty("configurationFactory")));
   }

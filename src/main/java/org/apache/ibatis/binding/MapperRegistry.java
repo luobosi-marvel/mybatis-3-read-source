@@ -34,6 +34,9 @@ import java.util.Set;
 public class MapperRegistry {
 
   private final Configuration config;
+  /**
+   * 一个 类类型就对应一个 MapperProxyFactory mapper 代理工厂，应该就是 一个 mapper 接口对应 一个 xml 文件的映射保存
+   */
   private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<>();
 
   public MapperRegistry(Configuration config) {
