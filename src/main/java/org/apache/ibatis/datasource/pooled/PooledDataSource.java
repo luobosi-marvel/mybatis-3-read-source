@@ -34,28 +34,61 @@ import org.apache.ibatis.logging.LogFactory;
 
 /**
  * This is a simple, synchronous, thread-safe database connection pool.
- *
+ * <p>
  * 数据库连接池好处：可以实现数据库连接的重用，提高响应速度，防止数据库连接过多造成数据库假死，避免数据库连接泄漏
+ *
  * @author Clinton Begin
  */
 public class PooledDataSource implements DataSource {
 
     private static final Log log = LogFactory.getLog(PooledDataSource.class);
 
+    /**
+     * 通过 PoolState 管理连接池的状态并纪律统计信息
+     */
     private final PoolState state = new PoolState(this);
 
+    /**
+     * 记录 UnpooledDataSource 对象，用于生成真实的数据库连接对象，构造函数中会初始化该字段
+     */
     private final UnpooledDataSource dataSource;
 
     // OPTIONAL CONFIGURATION FIELDS
+    /**
+     * 最大活跃连接数
+     */
     protected int poolMaximumActiveConnections = 10;
+    /**
+     * 最大空闲连接数
+     */
     protected int poolMaximumIdleConnections = 5;
+    /**
+     * 最大 checkout 时长
+     */
     protected int poolMaximumCheckoutTime = 20000;
+    /**
+     * 在无法获取连接时，线程需要等待的时间
+     */
     protected int poolTimeToWait = 20000;
+    /**
+     * 本地 BadConnection 最大容忍数
+     */
     protected int poolMaximumLocalBadConnectionTolerance = 3;
+    /**
+     * 在检测一个 数据库连接是否可用时，会给数据库发送一个测试 SQL 语句
+     */
     protected String poolPingQuery = "NO PING QUERY SET";
+    /**
+     * 是否允许发送测试 SQL 语句
+     */
     protected boolean poolPingEnabled;
+    /**
+     * 当连接超过 poolPingConnectionsNotUsedFor 毫秒未使用时，会发送一次测试 SQL 语句，检测连接是否正常
+     */
     protected int poolPingConnectionsNotUsedFor;
-
+    /**
+     * 根据数据库的 URL、用户名和密码生成一个 hash 值，该 hash 值用于标志着当前的连接池，在构造函数中初始化
+     */
     private int expectedConnectionTypeCode;
 
     public PooledDataSource() {
@@ -345,11 +378,21 @@ public class PooledDataSource implements DataSource {
         return ("" + url + username + password).hashCode();
     }
 
+    /**
+     * 调用一个 push 方法归还一个 数据库连接
+     * 当调用连接的代理对象的 close 方法时，并未关闭真正的数据连接，而是调用 PooledDataSource.pushConnection() 方法将
+     * PooledConnection 对象归还给连接池，重用
+     *
+     * @param conn 数据库连接
+     * @throws SQLException
+     */
     protected void pushConnection(PooledConnection conn) throws SQLException {
 
         synchronized (state) {
+            // 将连接从活跃状态移除
             state.activeConnections.remove(conn);
             if (conn.isValid()) {
+                // 检测空闲连接是否已经达到上限，以及 PooledConnection 对象是否有效
                 if (state.idleConnections.size() < poolMaximumIdleConnections && conn.getConnectionTypeCode() == expectedConnectionTypeCode) {
                     state.accumulatedCheckoutTime += conn.getCheckoutTime();
                     if (!conn.getRealConnection().getAutoCommit()) {
@@ -363,12 +406,15 @@ public class PooledDataSource implements DataSource {
                     if (log.isDebugEnabled()) {
                         log.debug("Returned connection " + newConn.getRealHashCode() + " to pool.");
                     }
+                    // 唤醒阻塞等待的线程
                     state.notifyAll();
                 } else {
+                    // 空闲连接数已达到上限或 PooledConnection 对象并不属于该连接池
                     state.accumulatedCheckoutTime += conn.getCheckoutTime();
                     if (!conn.getRealConnection().getAutoCommit()) {
                         conn.getRealConnection().rollback();
                     }
+                    // 关闭真正的数据库连接
                     conn.getRealConnection().close();
                     if (log.isDebugEnabled()) {
                         log.debug("Closed connection " + conn.getRealHashCode() + ".");
@@ -379,19 +425,30 @@ public class PooledDataSource implements DataSource {
                 if (log.isDebugEnabled()) {
                     log.debug("A bad connection (" + conn.getRealHashCode() + ") attempted to return to the pool, discarding connection.");
                 }
+                // 统计无效 PooledConnection 对象个数
                 state.badConnectionCount++;
             }
         }
     }
 
+    /**
+     * 根据用户名和密码获取一个数据库连接
+     *
+     * @param username 用户名
+     * @param password 密码
+     * @return 数据库连接
+     * @throws SQLException
+     */
     private PooledConnection popConnection(String username, String password) throws SQLException {
         boolean countedWait = false;
         PooledConnection conn = null;
         long t = System.currentTimeMillis();
+        // 失效连接的个数
         int localBadConnectionCount = 0;
 
         while (conn == null) {
             synchronized (state) {
+                // 只有存在空闲连接的时候才是最节省时间的
                 if (!state.idleConnections.isEmpty()) {
                     // Pool has available connection
                     conn = state.idleConnections.remove(0);
@@ -399,7 +456,7 @@ public class PooledDataSource implements DataSource {
                         log.debug("Checked out connection " + conn.getRealHashCode() + " from pool.");
                     }
                 } else {
-                    // Pool does not have available connection
+                    // Pool does not have available connection 没有达到最大连接数
                     if (state.activeConnections.size() < poolMaximumActiveConnections) {
                         // Can create new connection
                         conn = new PooledConnection(dataSource.getConnection(), this);

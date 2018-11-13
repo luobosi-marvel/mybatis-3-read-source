@@ -28,7 +28,13 @@ public class PoolState {
 
     protected PooledDataSource dataSource;
 
+    /**
+     * 空闲的 PooledConnection 集合
+     */
     protected final List<PooledConnection> idleConnections = new ArrayList<>();
+    /**
+     * 活跃的 PooledConnection 集合
+     */
     protected final List<PooledConnection> activeConnections = new ArrayList<>();
     // 请求数据库连接的次数
     protected long requestCount = 0;
