@@ -30,6 +30,7 @@ import org.apache.ibatis.session.RowBounds;
 
 /**
  * 用来处理接口中定义的方法的参数列表
+ * 参数名解析器
  */
 public class ParamNameResolver {
 
@@ -50,6 +51,9 @@ public class ParamNameResolver {
      */
     private final SortedMap<Integer, String> names;
 
+    /**
+     * 是否有 @Param 注解
+     */
     private boolean hasParamAnnotation;
 
     /**
@@ -60,8 +64,11 @@ public class ParamNameResolver {
      * @param method
      */
     public ParamNameResolver(Configuration config, Method method) {
+        // 获取参数的 类类型
         final Class<?>[] paramTypes = method.getParameterTypes();
+        // 存储参数列表里面的注解，这里为什么要定义成二维数组？
         final Annotation[][] paramAnnotations = method.getParameterAnnotations();
+        // 每个方法都会对应一个 TreeMap，里面保存了参数
         final SortedMap<Integer, String> map = new TreeMap<>();
         int paramCount = paramAnnotations.length;
         // get names from @Param annotations
@@ -94,10 +101,23 @@ public class ParamNameResolver {
         names = Collections.unmodifiableSortedMap(map);
     }
 
+    /**
+     * 获取实际参数的名称
+     *
+     * @param method        方法对象
+     * @param paramIndex    参数下标
+     * @return 返回实际参数的名称
+     */
     private String getActualParamName(Method method, int paramIndex) {
         return ParamNameUtil.getParamNames(method).get(paramIndex);
     }
 
+    /**
+     * 是否是指定的参数
+     *
+     * @param clazz 类类型
+     * @return true/false
+     */
     private static boolean isSpecialParameter(Class<?> clazz) {
         return RowBounds.class.isAssignableFrom(clazz) || ResultHandler.class.isAssignableFrom(clazz);
     }
