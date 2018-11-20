@@ -33,6 +33,8 @@ import java.util.Arrays;
 public class TypeParameterResolver {
 
     /**
+     * 解析字段类型
+     *
      * @return The field type as {@link Type}. If it has type parameters in the declaration,<br>
      *         they will be resolved to the actual runtime {@link Type}s.
      */
@@ -43,6 +45,8 @@ public class TypeParameterResolver {
     }
 
     /**
+     * 解析返回值类型
+     *
      * @return The return type of the method as {@link Type}. If it has type parameters in the declaration,<br>
      *         they will be resolved to the actual runtime {@link Type}s.
      */
@@ -53,6 +57,8 @@ public class TypeParameterResolver {
     }
 
     /**
+     * 解析参数类型
+     *
      * @return The parameter types of the method as an array of {@link Type}s. If they have type parameters in the declaration,<br>
      *         they will be resolved to the actual runtime {@link Type}s.
      */
@@ -220,6 +226,9 @@ public class TypeParameterResolver {
         super();
     }
 
+    /**
+     * 表示参数化类型
+     */
     static class ParameterizedTypeImpl implements ParameterizedType {
         private Class<?> rawType;
 
@@ -244,6 +253,12 @@ public class TypeParameterResolver {
             return ownerType;
         }
 
+        /**
+         * 获取参数化类型中的原始类型
+         * 例如 List<String> 的原始类型为 List
+         *
+         * @return Type
+         */
         @Override
         public Type getRawType() {
             return rawType;
@@ -255,6 +270,9 @@ public class TypeParameterResolver {
         }
     }
 
+    /**
+     * 表示通配符泛型
+     */
     static class WildcardTypeImpl implements WildcardType {
         private Type[] lowerBounds;
 
@@ -266,17 +284,30 @@ public class TypeParameterResolver {
             this.upperBounds = upperBounds;
         }
 
+        /**
+         * 返回泛型变量的下届
+         *
+         * @return 泛型变量的下届
+         */
         @Override
         public Type[] getLowerBounds() {
             return lowerBounds;
         }
 
+        /**
+         * 返回泛型变量的上界
+         *
+         * @return 泛型变量的上界
+         */
         @Override
         public Type[] getUpperBounds() {
             return upperBounds;
         }
     }
 
+    /**
+     * 表示的是数组类型且组成元素是 ParameterizedType 或 TypeVariable
+     */
     static class GenericArrayTypeImpl implements GenericArrayType {
         private Type genericComponentType;
 
